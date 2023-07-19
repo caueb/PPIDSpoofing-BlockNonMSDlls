@@ -42,6 +42,7 @@ DWORD getPPID(LPCWSTR processName) {
 	HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 	PROCESSENTRY32 process = { 0 };
 	process.dwSize = sizeof(process);
+	DWORD matchingProcessID = 0;
 
 	if (Process32First(snapshot, &process)) {
 		do {
@@ -51,6 +52,7 @@ DWORD getPPID(LPCWSTR processName) {
 					LPCWSTR integrityLevel = NULL;
 					integrityLevel = getIntegrityLevel(hProcess);
 					if (!wcscmp(integrityLevel, L"MEDIUM")) {
+						matchingProcessID = process.th32ProcessID;
 						break;
 					}
 				}
@@ -59,7 +61,7 @@ DWORD getPPID(LPCWSTR processName) {
 	}
 
 	CloseHandle(snapshot);
-	return process.th32ProcessID;
+	return matchingProcessID;
 }
 
 // This function will spawn a process with the given parameters
